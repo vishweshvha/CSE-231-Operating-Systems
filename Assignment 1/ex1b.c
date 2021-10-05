@@ -19,7 +19,16 @@ void average(char sec){
     char line[100][50];
     char *data = malloc(sizeof(char)*4000);
 
-    read(student_record, data, 4000);
+    if (data == NULL) {
+        printf("Memory not allocated.\n");
+        exit(0);
+    }
+
+    int sanity = read(student_record, data, 4000);
+    if(sanity <= 0){
+        printf("Could not read file.\n");
+        exit(0);
+    }
     close(student_record);
 
     while(data[char_ct]){
@@ -61,6 +70,7 @@ void average(char sec){
     }
     ct += count;
     printf("\n");
+    free(data);
 }
 
 void *averageA(void *vargp)
