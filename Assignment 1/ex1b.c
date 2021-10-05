@@ -15,20 +15,26 @@ void average(char sec){
     int student_record = open("student_record.csv", O_RDONLY);   
     float avg = 0, count = 0;
     float sum[6] = {0,0,0,0,0,0};
-    int row = 0, column = 0;
-    char data[1000], line[100][50];
+    int row = 0, column = 0, char_ct = 0;
+    char line[100][50];
+    char *data = malloc(sizeof(char)*2000);
 
     read(student_record, data, 1000);
     close(student_record);
+
+    while(data[char_ct]){
+        if(data[char_ct] == '\n') row++;
+        char_ct++;
+    }
     
     char* lines = strtok(data, "\n");
 
-    for(int i=0; i<26; i++){
+    for(int i=0; i<row; i++){
         lines = strtok(NULL, "\n");
         strcpy(line[i], lines);
     }
 
-    for(int i=0; i<26; i++){
+    for(int i=0; i<row; i++){
         column = 0;
     
         char* value = strtok(line[i], ",");
