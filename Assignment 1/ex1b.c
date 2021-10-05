@@ -6,10 +6,13 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <fcntl.h>
+#include <pthread.h>
+
+float averages[6] = {0,0,0,0,0,0};
+float ct = 0;
 
 void average(char sec){
     int student_record = open("student_record.csv", O_RDONLY);   
-
     float avg = 0, count = 0;
     float sum[6] = {0,0,0,0,0,0};
     int row = 0, column = 0;
@@ -48,22 +51,45 @@ void average(char sec){
         avg = sum[i]/count;
         printf("\nAssignment %d ", i+1);
         printf("Average: %0.2f", avg);
+        averages[i] += sum[i];
+    }
+    ct += count;
+    printf("\n");
+}
+
+void *averageA(void *vargp)
+{
+    average('A');
+}
+
+void *averageB(void *vargp)
+{
+    sleep(1);
+    printf("\n");
+    average('B');
+}
+
+void *averageAll(void *vargp)
+{   
+    sleep(2);
+    printf("\nAverages for both Sections");
+    for(int i=0; i<6; i++){
+        printf("\nAssignment %d ", i+1);
+        printf("Average: %0.2f", (averages[i]/ct));
     }
     printf("\n");
 }
 
-int main (){
-    pid_t pid;
-    int status;
+int main()
+{
+    pthread_t p1, p2, p3;
+    pthread_create(&p1, NULL, averageA, NULL);
+    pthread_create(&p2, NULL, averageB, NULL);
+    pthread_create(&p3, NULL, averageAll, NULL);
 
-    pid = fork();
-    if (pid == 0){
-        average('A');
-        exit(1);
-    }
+    pthread_join(p1, NULL);
+    pthread_join(p2, NULL);
+    pthread_join(p3, NULL);
 
-    waitpid(pid, &status, 0);
-    printf("\n");
-    average('B');
-    return(0);
+    return 0;
 }
