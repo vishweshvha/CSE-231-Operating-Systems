@@ -22,8 +22,6 @@ _printASCII:
     push rbp
     mov rbp, rsp
 
-    ;ror rsp, 32
-
     mov rax, 1
     mov rdi, 1
     mov rsi, rbp
