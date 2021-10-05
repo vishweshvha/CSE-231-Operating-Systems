@@ -13,9 +13,9 @@ void average(char sec){
     float sum[6] = {0,0,0,0,0,0};
     int row = 0, column = 0, char_ct = 0;
     char line[100][50];
-    char *data = malloc(sizeof(char)*2000);
+    char *data = malloc(sizeof(char)*4000);
 
-    read(student_record, data, 2000);
+    read(student_record, data, 4000);
     close(student_record);
 
     while(data[char_ct]){
