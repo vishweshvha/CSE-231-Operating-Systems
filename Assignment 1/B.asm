@@ -19,18 +19,13 @@ _enterB:
     ret
 
 _printASCII:
-    push rbp
-    mov rbp, rsp
-
     mov rax, 1
     mov rdi, 1
-    mov rsi, rbp
-    mov rdx, 40
+    mov rsi, rsp
+    mov rdx, 32
     syscall
-
-    mov rsp, rbp
-    pop rbp
     ret     
 
-_exitC:
-    call C
+_exitC: 
+    push C
+    ret
