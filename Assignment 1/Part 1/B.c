@@ -6,9 +6,13 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <fcntl.h>
+#include <pthread.h>
+
+float averages[6] = {0,0,0,0,0,0};
+float ct = 0;
 
 void average(char sec){
-    int student_record = open("student_record.csv", O_RDONLY);   
+    int student_record = open("student_record.csv", O_RDONLY);
     float avg = 0, count = 0;
     float sum[6] = {0,0,0,0,0,0};
     int row = 0, column = 0, char_ct = 0;
@@ -30,8 +34,8 @@ void average(char sec){
     while(data[char_ct]){
         if(data[char_ct] == '\n') row++;
         char_ct++;
-    } 
-    
+    }
+
     char* lines = strtok(data, "\n");
 
     for(int i=0; i<row; i++){
@@ -41,7 +45,7 @@ void average(char sec){
 
     for(int i=0; i<row; i++){
         column = 0;
-    
+
         char* value = strtok(line[i], ",");
         while(value){
             if ((column == 1) && (*value!=sec)) break;
@@ -62,23 +66,50 @@ void average(char sec){
         avg = sum[i]/count;
         printf("\nAssignment %d ", i+1);
         printf("Average: %0.2f", avg);
+        averages[i] += sum[i];
     }
+    ct += count;
     printf("\n");
     free(data);
 }
 
-int main (){
-    pid_t pid;
-    int status;
+void *averageA(void *vargp)
+{
+    printf("Thread created for A\n");
+    sleep(1);
+    average('A');
+}
 
-    pid = fork();
-    if (pid == 0){
-        average('A');
-        exit(1);
-    }
-
-    waitpid(pid, &status, 0);
+void *averageB(void *vargp)
+{
+    printf("Thread created for B\n");
+    sleep(2);
     printf("\n");
     average('B');
-    return(0);
+}
+
+void *averageAll(void *vargp)
+{
+    printf("Thread created for Both\n");
+    sleep(3);
+    printf("\nAverages for both Sections");
+    for(int i=0; i<6; i++){
+        printf("\nAssignment %d ", i+1);
+        printf("Average: %0.2f", (averages[i]/ct));
+    }
+    printf("\n");
+}
+
+int main()
+{
+    pthread_t p1, p2, p3;
+    pthread_create(&p1, NULL, averageA, NULL);
+    pthread_create(&p2, NULL, averageB, NULL);
+    pthread_create(&p3, NULL, averageAll, NULL);
+
+    pthread_join(p1, NULL);
+    pthread_join(p2, NULL);
+    pthread_join(p3, NULL);
+
+    return 0;
 }
