@@ -10,10 +10,14 @@
 #include <sys/time.h>
 
 void sigalrm(){
+    unsigned int x;
+    __asm__ volatile ("rdrand %0": "=r" (x));
+    char num[64];
+    sprintf(num, "%d", x);
     int key = ftok("hello.txt", 'R');
     int shmid = shmget(key,1024,0666|IPC_CREAT);
     char *data = shmat(shmid, NULL, 0);
-    strncpy(data, "RDRAND", 6);
+    strncpy(data, num, 64);
     shmdt(&data);
 }
 
