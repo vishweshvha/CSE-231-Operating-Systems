@@ -15,6 +15,7 @@ struct StringEntry {
 void generate_random_string(char *str, size_t length) {
     while (length-- > 1) {
         *str++ = (char) (rand() % 26) + 65;
+        //*str++ = (char) rand() %256; // for all characters
     }
     *str = '\0';
 }
