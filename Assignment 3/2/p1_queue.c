@@ -13,12 +13,12 @@
 #include "utils.h"
 
 struct s_buffer {
-    long mesg_type;
+    long type;
     struct StringEntry string_entries;
 } sbuffer;
 
 struct r_buffer {
-    long mesg_type;
+    long type;
     int id;
 } rbuffer;
 
@@ -44,7 +44,7 @@ int main(){
         if (id_req == 50) {
             break;
         }
-        sbuffer.mesg_type = 1;
+        sbuffer.type = 1;
         for (int i=id_req; i<id_req+5; i++) {
             sbuffer.string_entries.id_[i - id_req] = i;
             strncpy(sbuffer.string_entries.str_[i - id_req], string_array[i], MAX_STRING_LENGTH);
