@@ -12,34 +12,35 @@
 
 #include "utils.h"
 
-#define MAX 10
-
-struct mesg_buffer {
+struct s_buffer {
     long mesg_type;
-    char mesg_text[100];
-} message;
+    struct StringEntry string_entries;
+} sbuffer;
+
+struct r_buffer {
+    long mesg_type;
+    int id;
+} rbuffer;
   
 int main()
 {
     key_t key;
     int msgid;
-  
-    // ftok to generate unique key
     key = ftok("progfile", 65);
-  
-    // msgget creates a message queue
-    // and returns identifier
     msgid = msgget(key, 0666 | IPC_CREAT);
-  
-    // msgrcv to receive message
-    msgrcv(msgid, &message, sizeof(message), 1, 0);
-  
-    // display the message
-    printf("Data Received is : %s \n", 
-                    message.mesg_text);
-  
-    // to destroy the message queue
-    msgctl(msgid, IPC_RMID, NULL);
-  
+    int id_req = 0;
+    while(id_req < 49){
+        rbuffer.mesg_type = 1;
+        rbuffer.id = id_req;
+        msgsnd(msgid, &rbuffer, sizeof(rbuffer), 0);
+        msgrcv(msgid, &sbuffer, sizeof(sbuffer), 1, 0);
+        struct StringEntry data = sbuffer.string_entries;
+        for (int j = 0; j < 5; j++){
+            printf("%d: %s\n", data.id_[j], data.str_[j]);
+        }
+        id_req = data.id_[4];
+    }
+    rbuffer.id = id_req;
+    msgsnd(msgid, &rbuffer, sizeof(rbuffer), 0);
     return 0;
 }

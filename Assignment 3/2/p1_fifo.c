@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <sys/time.h>
 
+
 #include "utils.h"
 
 int main(){
@@ -27,7 +28,7 @@ int main(){
     struct StringEntry string_entries;
     char buffer[1024];
     int id_req = -1;
-    while(id_req < 45){
+    while(id_req < 50){
         file_descriptor = open(myfifo, O_RDONLY);
         int ret = read(file_descriptor, buffer, sizeof(struct StringEntry));
         if (ret==-1){
@@ -42,7 +43,7 @@ int main(){
         if (id_req > 0) {
             id_req += 1;
         }
-        if (id_req == 49) {
+        if (id_req == 50) {
             break;
         }
         close(file_descriptor);

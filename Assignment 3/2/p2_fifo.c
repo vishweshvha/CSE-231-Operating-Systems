@@ -33,5 +33,8 @@ int main()
         id_req = data->id_[4];
         close(file_descriptor);
     }
+    file_descriptor = open(myfifo,O_WRONLY);
+    write(file_descriptor, (char *) &id_req, sizeof(id_req));
+    close(file_descriptor);
     return 0;
 }
