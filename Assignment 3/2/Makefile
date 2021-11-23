@@ -5,3 +5,4 @@ all:
 	gcc p2_fifo.c -o p2_fifo
 	gcc p1_queue.c -o p1_queue
 	gcc p2_queue.c -o p2_queue
+	gcc clear_queue.c -o clear_queue

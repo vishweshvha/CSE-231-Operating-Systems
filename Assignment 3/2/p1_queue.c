@@ -13,12 +13,12 @@
 #include "utils.h"
 
 struct s_buffer {
-    long type;
+    long mesg_type;
     struct StringEntry string_entries;
 } sbuffer;
 
 struct r_buffer {
-    long type;
+    long mesg_type;
     int id;
 } rbuffer;
 
@@ -36,6 +36,9 @@ int main(){
     int id_req = -1;
     while(id_req < 50){
         msgrcv(msgid, &rbuffer, sizeof(rbuffer), 1, 0);
+        if(rbuffer.id == id_req){
+            continue;
+        }
         id_req = rbuffer.id;
         printf("ID: %d\n", id_req);
         if (id_req > 0) {
@@ -44,7 +47,7 @@ int main(){
         if (id_req == 50) {
             break;
         }
-        sbuffer.type = 1;
+        sbuffer.mesg_type = 1;
         for (int i=id_req; i<id_req+5; i++) {
             sbuffer.string_entries.id_[i - id_req] = i;
             strncpy(sbuffer.string_entries.str_[i - id_req], string_array[i], MAX_STRING_LENGTH);
