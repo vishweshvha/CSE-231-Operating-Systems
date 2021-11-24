@@ -5,27 +5,33 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/time.h>
 
 void sigterm(){
-    printf("CHILD: I have received a SIGTERM\n");
+    int key = ftok("hello.txt", 'R');
+    int shmid = shmget(key,1024,0666|IPC_CREAT);
+    char *data = shmat(shmid, NULL, 0);
+    printf("%s\n", data);
+    shmdt(&data);
+    shmctl(shmid, IPC_RMID, 0);
 }
 
-void S1(){
-    printf("1 %d\n", getpid());
-    kill(getpid(), SIGTERM);
-}
-
-void ST(){
-    printf("t %d\n", getpid());
-    char *args[]={"./E1",NULL};
+void SR(int ppid){
+    char pid[10];
+    sprintf(pid, "%d", ppid);
+    char *args[]={"./E1", pid , NULL};
     execv(args[0],args);
 }
 
-void SR(){
-    printf("r %d\n", getpid());
-    char *args[]={"./E1",NULL};
+void ST(int ppid){
+    char pid[10];
+    sprintf(pid, "%d", ppid);
+    char *args[]={"./E2", pid , NULL};
     execv(args[0],args);
 }
+
 
 int main(){
     pid_t pid, pid_st, pid_sr;
@@ -37,32 +43,29 @@ int main(){
 
     if (pid == 0){
         signal(SIGTERM, sigterm);
-        S1();
 
         if ((pid_st = fork()) < 0){
             perror("\nError in fork()");
             exit(0);
         }
 
-        if (pid_st == 0){
-            ST();
+        int ppid = getppid();
 
+        if (pid_st == 0){
             if ((pid_sr = fork()) < 0){
                 perror("\nError in fork()");
                 exit(0);
             }
 
             if (pid_sr == 0){
-                SR();
+                SR(ppid);
             }
 
-            waitpid(pid_sr, NULL, 0);
+            ST(ppid);
+            sleep(2);
         }
-
-        waitpid(pid_st, NULL, 0);
     }
 
     waitpid(pid, NULL, 0);
-
     return(0);
 }
