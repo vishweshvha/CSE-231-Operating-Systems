@@ -14,7 +14,7 @@ void A(){
     printf("\n Entered A");
     printf("\n-----------");
 
-    long long int num = INT64_C(4702111234474983745);
+    long long int num = INT64_C(97);
     printf("\n64 Bit Number: %llu\n", num);
 
     char arr[8];
